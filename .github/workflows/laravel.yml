@@ -1,35 +1,23 @@
-
-name: Deloy
-
 on:
   push:
-    branches: [ master ]
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  deloy:
+  run_pull:
+    name: run pull
     runs-on: ubuntu-latest
 
     steps:
-      #- name: Deploy using ssh
-      #  run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd  /code/testdeploy/ && git checkout master && git pull && exit"
-      - name: Deploy using ssh
-
-      #- name: Checkout code
-      #  uses: actions/checkout@v2
-
-      - name: Install SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Deploy code
-        run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "cd /path/to/your/app && git pull origin main"
-          
-        
-         # with:
-          #  host: ${{ secrets.HOST }}
-          #  username: ${{ secrets.USERNAME }}
-          #  password: ${{ secrets.PASSWORD }}
-          #  port: ${{ secrets.PORT }}
-          #  # key: ${{ secrets.PRIVATE_KEY }}
-          #  script: "cd /data/edubit/edubit.php && git reset --hard && git pull origin develop"
-
+      - name: install ssh keys
+        # check this thread to understand why its needed:
+        # https://stackoverflow.com/a/70447517
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+      - name: connect and pull
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd  /root/code/testdeploy/ && git checkout master && git pull && exit"
+      - name: cleanup
+        run: rm -rf ~/.ssh
