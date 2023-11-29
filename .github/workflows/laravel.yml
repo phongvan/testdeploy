@@ -1,1 +1,25 @@
 
+name: Deloy
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deloy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy using ssh
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd  /code/testdeploy/ && git checkout master && git pull && exit"
+
+
+
+       # with:
+        #  host: ${{ secrets.HOST }}
+        #  username: ${{ secrets.USERNAME }}
+        #  password: ${{ secrets.PASSWORD }}
+        #  port: ${{ secrets.PORT }}
+        #  # key: ${{ secrets.PRIVATE_KEY }}
+        #  script: "cd /data/edubit/edubit.php && git reset --hard && git pull origin develop"
+
