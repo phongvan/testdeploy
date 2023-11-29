@@ -1,4 +1,4 @@
-name: Deloy
+name: Deploy
 
 on:
   push:
@@ -9,12 +9,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Deploy using ssh
+    - name: Deploy using ssh private Key
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
-        password: (Q7biTxJ+8.p8g+5
+        #password: (Q7biTxJ+8.p8g+5
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
+
         # key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: "cd /root/code/testdeploy && git checkout master && git pull && exit"
