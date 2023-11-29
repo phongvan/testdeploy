@@ -2,21 +2,27 @@ name: Deploy
 
 on:
   push:
-    branches: [ master ]
-
+    branches:
+      - main
+  workflow_dispatch:
+  
 jobs:
-  deloy:
+  run_pull:
+    name: run pull
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Deploy using ssh private Key
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        #password: (Q7biTxJ+8.p8g+5
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: 22
+    - name: install ssh keys
+      # check this thread to understand why its needed:
+      # https://stackoverflow.com/a/70447517
+      run: |
+        install -m 600 -D /dev/null ~/.ssh/id_rsa
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+    - name: connect and pull
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /root/code/testdeploy && git checkout master && git pull && exit"
+    - name: cleanup
+      run: rm -rf ~/.ssh
 
-        # key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: "cd /root/code/testdeploy && git checkout master && git pull && exit"
+      # key: ${{ secrets.SSH_PRIVATE_KEY }}
+      # script: "cd /root/code/testdeploy && git checkout master && git pull && exit"
