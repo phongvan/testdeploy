@@ -14,7 +14,7 @@ jobs:
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USER }}
-        password: (Q7biTxJ+8.p8g+5
+        password: MK_SERVER
         #key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
 
